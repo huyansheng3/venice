@@ -10,13 +10,13 @@
             <span>
               {{item.label}}
             </span>
-            <span>
+            <span :class="{status: item.status, [item.status]: true}">
               {{item.value}}
             </span>
           </li>
         </ul>
 
-        <img class="status" :src="statusImg" alt="status">
+        <img class="status-img" :src="statusImg" alt="status">
       </section>
     </section>
   </section>
@@ -26,18 +26,18 @@
 import { Header, Button, Cell } from "mint-ui";
 import pageMixin from "../page-mixin";
 import { getStatusText } from "./index";
-import Vue from 'vue';
-import REPAYING from './REPAYING.svg';
-import COMPLETED from './COMPLETED.svg';
-import LIQUIDATED from './LIQUIDATED.svg';
-import OVERDUED from './OVERDUED.svg';
+import Vue from "vue";
+import REPAYING from "./REPAYING.svg";
+import COMPLETED from "./COMPLETED.svg";
+import LIQUIDATED from "./LIQUIDATED.svg";
+import OVERDUED from "./OVERDUED.svg";
 
 const imgMap = {
   REPAYING,
   COMPLETED,
   LIQUIDATED,
   OVERDUED
-}
+};
 // createUser: "",
 // updateUser: "",
 // id: 3,
@@ -114,12 +114,13 @@ const list = borrow => [
   },
   {
     label: "订单状态：",
+    status: borrow.status,
     value: getStatusText(borrow.status)
   }
 ];
 
-function getStatusImg(status = 'REPAYING') {
-  return imgMap[status] 
+function getStatusImg(status = "REPAYING") {
+  return imgMap[status];
 }
 
 export default {
@@ -139,7 +140,7 @@ export default {
       return list(this.borrow);
     },
     statusImg() {
-      return getStatusImg(this.borrow.status)
+      return getStatusImg(this.borrow.status);
     }
   },
   methods: {},
@@ -178,10 +179,23 @@ export default {
         padding: 15px 20px;
         .item {
           padding: 5px 0;
+
+          .status.REPAYING {
+            color: @wait-pay;
+          }
+          .status.COMPLETED {
+            color: @finish;
+          }
+          .status.LIQUIDATED {
+            color: @close-out;
+          }
+          .status.OVERDUED {
+            color: @overdue;
+          }
         }
       }
 
-      .status {
+      .status-img {
         position: absolute;
         width: 90px;
         top: 0;
