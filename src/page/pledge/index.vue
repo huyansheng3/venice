@@ -9,7 +9,13 @@
           <div class="form-item">
             <label for="pledgeCurr">
               <span>质押币种</span></label>
-            <cube-select class="pledge-select" @change="handlePledgeCurrChange" v-model="pledgeCurr" :options="pledgeCurrList"></cube-select>
+              <div class="pledge-select" >
+                <cube-select @change="handlePledgeCurrChange" v-model="pledgeCurr" :options="pledgeCurrList"></cube-select>
+                <p>
+                  1BTC=44437.67CNY
+                </p>
+              </div>
+            
           </div>
           <div class="form-item">
             <label for="applyBorrowValue">
@@ -19,7 +25,7 @@
             <div class="borrow">
                 <div class="borrow-container">
                   <div class="borrow-input">
-                    <cube-input type="number">
+                    <cube-input v-model="borrowNum" type="number">
                       <cube-select class="borrow-curr-select" slot="append" v-model="borrowCurr" :options="loanCurrList"></cube-select>
                     </cube-input> 
                   </div>
@@ -27,8 +33,7 @@
                   <img  src="./exchange.png" alt="exchange">
 
                   <div class="borrow-input" >
-                    <cube-input type="number" placeholder="" :disabled="true"></cube-input>          
-                    
+                    <cube-input :placeholder="`质押数量：2${pledgeCurr}`" type="number"  :disabled="true"></cube-input>          
                   </div>
                 </div>
                 
@@ -53,16 +58,25 @@
             <label for="borrowDays">
               <span>借款期限</span>
               </label>
-            <cube-select class="pledge-select" v-model="borrowDays" :options="loanLimit"></cube-select>
+
+             
+              <div class="pledge-select">
+                <cube-select v-model="borrowDays" :options="loanLimit"></cube-select>
+                <p>到期本息合计:4531.012 USDT(或等价ETH)</p>
+              </div>
+            
           </div>
         </section>
 
         <mt-button @click="confirm" class="button" type="primary">确认</mt-button>
 
-        <p class="agreement">
-          我已阅读并同意
-          <router-link to="/pledge/agreement">《质押借款协议》</router-link>
-        </p>
+        <cube-checkbox class="agreement" v-model="agreement">
+          <div class="agreement-text">
+            我已阅读并同意
+            <router-link to="/pledge/agreement">《质押借款协议》</router-link>
+          </div>
+        </cube-checkbox>
+
       </section>
     </section>
   </section>
@@ -71,6 +85,7 @@
 <script>
 import { Header, Button, Radio } from 'mint-ui'
 import { mapState, mapMutations, mapActions } from 'vuex'
+import {applyLoan} from '@/service/getData'
 
 const item = {
   userNo: '11111',
@@ -104,11 +119,12 @@ export default {
       borrowDays: 30,
       entrustNum: 0.15,
       loanNum: 14.85,
+      agreement: false,
     }
   },
   computed: {
     ...mapState({
-      availablePledgeNum: state=>state.pledge.availablePledgeNum,
+      availablePledgeNum: state => state.pledge.availablePledgeNum,
       pledgeCurrList: state =>
         state.pledge.pledgeCurrList.map(item => ({
           text: `${item.remark} (${item.curr})`,
@@ -133,8 +149,14 @@ export default {
       'queryAllPledgeCurrList',
       'queryAvailablePledgeNum',
     ]),
-    confirm() {
-      this.$router.push({ name: 'pledgeSuccess' })
+    validate() {
+      return true
+    },
+    async confirm() {
+      if(this.validate()) {
+        await applyLoan(this.$data)
+        this.$router.push({ name: 'pledgeSuccess' })
+      }
     },
     handlePledgeCurrChange(value) {
       this.queryAvailablePledgeNum({ curr: value })
@@ -157,6 +179,7 @@ export default {
       width: 100%;
     }
     .content {
+      padding: 20px 15px 0;
       .form {
         font-size: 15px;
         color: @text-gray;
@@ -173,6 +196,11 @@ export default {
           .borrow {
             flex: 3;
             font-size: 12px;
+          }
+          .pledge-select {
+            p {
+              margin-top: 10px;
+            }
           }
 
           .borrow-container {
@@ -211,11 +239,17 @@ export default {
         }
       }
 
-      padding: 20px 15px 0;
       .agreement {
         margin-top: 22px;
         font-size: 14px;
-        text-align: center;
+        .cube-checkbox-wrap {
+          margin: 0 auto;
+          width: 80%;
+        }
+      }
+
+      .button {
+        margin-top: 50px;
       }
     }
   }
