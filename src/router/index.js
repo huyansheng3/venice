@@ -10,7 +10,7 @@ const BorrowList = ()=> import('page/borrow');
 const BorrowItem = ()=> import('page/borrow/item');
 
 /* cms */
-const Index = () => import ('page/cms/index')
+// const Index = () => import ('page/cms/index')
 // const Article = () =>   import ('page/cms/article')
 // const ArticleDetail = () => import ('page/cms/articleDetail')
     /* cms */
@@ -73,12 +73,12 @@ const appRouter = {
                 component: BorrowItem,
                 meta: { keepAlive: false }
             },
-            {
-                path: '/index',
-                name: 'index',
-                component: Index,
-                meta: { keepAlive: true }
-            },
+            // {
+            //     path: '/index',
+            //     name: 'index',
+            //     component: Index,
+            //     meta: { keepAlive: true }
+            // },
             
             // {
             //     path: '/article',

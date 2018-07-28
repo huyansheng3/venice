@@ -8,8 +8,15 @@
     "start": "npm run dev",
     "build": "node build/build.js"
   },
+  "transformModules": {
+    "cube-ui": {
+      "transform": "cube-ui/src/modules/${member}",
+      "kebabCase": true
+    }
+  },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "cube-ui": "^1.10.8",
     "es6-promise": "^4.2.2",
     "fastclick": "^1.0.6",
     "mint-ui": "^2.2.13",
@@ -66,7 +73,11 @@
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.9.1",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^2.1.1",
+    "webpack-post-compile-plugin": "^0.4.1",
+    "webpack-transform-modules-plugin": "^0.3.5"
   },
   "engines": {
     "node": ">= 4.0.0",

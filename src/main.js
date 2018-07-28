@@ -13,6 +13,8 @@ import FastClick from 'fastclick'
 import '@/utils/directives'
 import '@/utils/filters'
 import VeeValidate from 'vee-validate';
+import Cube from 'cube-ui'
+
 if ('addEventListener' in document) {
     document.addEventListener('DOMContentLoaded', function() {
         FastClick.attach(document.body);
@@ -20,6 +22,7 @@ if ('addEventListener' in document) {
 }
 
 Vue.use(MintUI)
+Vue.use(Cube)
 Vue.use(VeeValidate);
 router.beforeEach((to,from,next)=>{
     next();

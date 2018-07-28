@@ -1,22 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import app from './modules/app'
-import getters from './getters'
 
-import shop from './modules/shop'
-import cms from './modules/cms'
-import user from './modules/user'
+import pledge from './modules/pledge'
+import borrow from './modules/borrow'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   modules: {
-    app,
-    shop,
-    cms,
-    user
+    pledge,
+    borrow
   },
-  getters
 })
 
 export default store
