@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <mt-header title="提供成功">
+    <mt-header title="提交成功">
       <mt-button @click="goBack" slot="left" icon="back"></mt-button>
     </mt-header>
     <section class="main">
@@ -10,7 +10,7 @@
         您的借款申请提交，预计24小时内放款到您的银行卡，请注意查收！
       </p>
   
-      <mt-button class="button" type="primary">确定</mt-button>
+      <mt-button @click="confirm" class="button" type="primary">确定</mt-button>
     </section>
 
   </section>
@@ -24,6 +24,11 @@ export default {
   components: {
     Header,
     Button
+  },
+  methods: {
+    confirm() {
+      this.$router.push({ name: 'pledge' })
+    }
   }
 };
 </script>

@@ -31,6 +31,7 @@ import REPAYING from "./REPAYING.svg";
 import COMPLETED from "./COMPLETED.svg";
 import LIQUIDATED from "./LIQUIDATED.svg";
 import OVERDUED from "./OVERDUED.svg";
+import {mapActions, mapState, mapMutations} from 'vuex'
 
 const imgMap = {
   REPAYING,
@@ -132,25 +133,33 @@ export default {
   },
   data() {
     return {
-      borrow: {}
     };
   },
   computed: {
+    ...mapState(['order']),
     borrowList() {
-      return list(this.borrow);
+      return list(this.order);
     },
     statusImg() {
-      return getStatusImg(this.borrow.status);
+      return getStatusImg(this.order.status);
     }
   },
-  methods: {},
+  methods: {
+    ...mapMutations(['setOrder']),
+    ...mapActions(['queryOrder']),
+  },
   created() {
     const { borrow } = this.$route.query;
     try {
-      this.borrow = JSON.parse(decodeURIComponent(borrow));
+      const initBorrow = JSON.parse(decodeURIComponent(borrow));
+      this.setOrder(initBorrow)
     } catch (e) {
       console.error(e);
     }
+  },
+  mounted() {
+    const {id} = this.$route.params
+    this.queryOrder({id});
   }
 };
 </script>

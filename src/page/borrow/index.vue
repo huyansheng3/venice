@@ -4,9 +4,12 @@
       <mt-button @click="goBack" slot="left" icon="back"></mt-button>
     </mt-header>
     <section class="main">
-      <no-borrow v-if="!borrows.length"></no-borrow>
-      <section class="list" v-else v-for="borrow in borrows" :key="borrow.id">
-        <div class="item" :class="borrow.status" @click="handleClick(borrow)">
+      <no-borrow v-if="!orders.length"></no-borrow>
+      <section 
+        v-infinite-scroll="loadMore"
+        :infinite-scroll-disabled="loading"
+        class="list" v-else >
+        <div class="item" v-for="borrow in orders" :key="borrow.id" :class="borrow.status" @click="handleClick(borrow)">
           <div class="amount row">
             <div class="amount-number col">
               ￥ {{borrow.applyBorrowValue}}
@@ -18,7 +21,7 @@
           <div class="time row">
             <div class="col date">
               <div>
-                申请日期：{{borrow.applyDate | DateFormat('yyyy/MM/dd') }}
+                <!-- 申请日期：{{borrow.applyDate | DateFormat('yyyy/MM/dd') }} -->
               </div>
               <div>
                 借款期限：{{borrow.borrowDays}}天
@@ -35,157 +38,182 @@
 </template>
 
 <script>
-import { Header, Button, Cell } from "mint-ui";
-import pageMixin from "../page-mixin";
-import NoBorrow from "./no-borrow";
+import { Header, Button, Cell } from 'mint-ui'
+import pageMixin from '../page-mixin'
+import NoBorrow from './no-borrow'
+import { mapState, mapMutations, mapActions } from 'vuex'
 
 const items = [
   {
-    createUser: "",
-    updateUser: "",
+    createUser: '',
+    updateUser: '',
     id: 1,
-    orderNo: "11111_2018072712034718867409",
-    userNo: "11111",
-    pledgeCurr: "BTC",
+    orderNo: '11111_2018072712034718867409',
+    userNo: '11111',
+    pledgeCurr: 'BTC',
     pledgeNum: 10.5,
-    borrowCurr: "ETH",
+    borrowCurr: 'ETH',
     borrowNum: 15,
     applyPledgeValue: 80000,
     applyBorrowValue: 45000,
     loanPledgeValue: 85000.12,
     loanBorrowValue: 48000,
     borrowDays: 30,
-    applyDate: "2018-07-26T16:00:00.000+0000",
-    loanDate: "2018-07-26T16:00:00.000+0000",
+    applyDate: '2018-07-26T16:00:00.000+0000',
+    loanDate: '2018-07-26T16:00:00.000+0000',
     entrustNum: 1.485,
     entrustRate: 0.1,
     loanNum: 14.85,
-    status: "REPAYING",
+    status: 'REPAYING',
     interestRate: 0.001,
-    deadlineDate: "2018-08-25T16:00:00.000+0000",
-    mortgageRate: 0.5
+    deadlineDate: '2018-08-25T16:00:00.000+0000',
+    mortgageRate: 0.5,
   },
   {
-    createUser: "",
-    updateUser: "",
+    createUser: '',
+    updateUser: '',
     id: 2,
-    orderNo: "11111_2018072712034718867409",
-    userNo: "11111",
-    pledgeCurr: "BTC",
+    orderNo: '11111_2018072712034718867409',
+    userNo: '11111',
+    pledgeCurr: 'BTC',
     pledgeNum: 10.5,
-    borrowCurr: "ETH",
+    borrowCurr: 'ETH',
     borrowNum: 15,
     applyPledgeValue: 80000,
     applyBorrowValue: 45000,
     loanPledgeValue: 85000.12,
     loanBorrowValue: 48000,
     borrowDays: 30,
-    applyDate: "2018-07-26T16:00:00.000+0000",
-    loanDate: "2018-07-26T16:00:00.000+0000",
+    applyDate: '2018-07-26T16:00:00.000+0000',
+    loanDate: '2018-07-26T16:00:00.000+0000',
     entrustNum: 1.485,
     entrustRate: 0.1,
     loanNum: 14.85,
-    status: "COMPLETED",
+    status: 'COMPLETED',
     interestRate: 0.001,
-    deadlineDate: "2018-08-25T16:00:00.000+0000",
-    mortgageRate: 0.5
+    deadlineDate: '2018-08-25T16:00:00.000+0000',
+    mortgageRate: 0.5,
   },
   {
-    createUser: "",
-    updateUser: "",
+    createUser: '',
+    updateUser: '',
     id: 3,
-    orderNo: "11111_2018072712034718867409",
-    userNo: "11111",
-    pledgeCurr: "BTC",
+    orderNo: '11111_2018072712034718867409',
+    userNo: '11111',
+    pledgeCurr: 'BTC',
     pledgeNum: 10.5,
-    borrowCurr: "ETH",
+    borrowCurr: 'ETH',
     borrowNum: 15,
     applyPledgeValue: 80000,
     applyBorrowValue: 45000,
     loanPledgeValue: 85000.12,
     loanBorrowValue: 48000,
     borrowDays: 30,
-    applyDate: "2018-07-26T16:00:00.000+0000",
-    loanDate: "2018-07-26T16:00:00.000+0000",
+    applyDate: '2018-07-26T16:00:00.000+0000',
+    loanDate: '2018-07-26T16:00:00.000+0000',
     entrustNum: 1.485,
     entrustRate: 0.1,
     loanNum: 14.85,
-    status: "LIQUIDATED",
+    status: 'LIQUIDATED',
     interestRate: 0.001,
-    deadlineDate: "2018-08-25T16:00:00.000+0000",
-    mortgageRate: 0.5
+    deadlineDate: '2018-08-25T16:00:00.000+0000',
+    mortgageRate: 0.5,
   },
   {
-    createUser: "",
-    updateUser: "",
+    createUser: '',
+    updateUser: '',
     id: 4,
-    orderNo: "11111_2018072712034718867409",
-    userNo: "11111",
-    pledgeCurr: "BTC",
+    orderNo: '11111_2018072712034718867409',
+    userNo: '11111',
+    pledgeCurr: 'BTC',
     pledgeNum: 10.5,
-    borrowCurr: "ETH",
+    borrowCurr: 'ETH',
     borrowNum: 15,
     applyPledgeValue: 80000,
     applyBorrowValue: 45000,
     loanPledgeValue: 85000.12,
     loanBorrowValue: 48000,
     borrowDays: 30,
-    applyDate: "2018-07-26T16:00:00.000+0000",
-    loanDate: "2018-07-26T16:00:00.000+0000",
+    applyDate: '2018-07-26T16:00:00.000+0000',
+    loanDate: '2018-07-26T16:00:00.000+0000',
     entrustNum: 1.485,
     entrustRate: 0.1,
     loanNum: 14.85,
-    status: "OVERDUED",
+    status: 'OVERDUED',
     interestRate: 0.001,
-    deadlineDate: "2018-08-25T16:00:00.000+0000",
-    mortgageRate: 0.5
-  }
-];
+    deadlineDate: '2018-08-25T16:00:00.000+0000',
+    mortgageRate: 0.5,
+  },
+]
 
 export const statusMap = {
-  REPAYING: "待还款",
-  COMPLETED: "已完成",
-  LIQUIDATED: "已平仓",
-  OVERDUED: "已逾期"
-};
+  REPAYING: '待还款',
+  COMPLETED: '已完成',
+  LIQUIDATED: '已平仓',
+  OVERDUED: '已逾期',
+}
 
 export function getStatusText(status) {
-  return statusMap[status] || "待还款";
+  return statusMap[status] || '待还款'
 }
 
 export default {
   mixins: [pageMixin],
   components: {
-    Header,
     Button,
     NoBorrow,
-    Cell
+    Cell,
   },
   data() {
     return {
-      borrows: items
-    };
+      userNo: '11111',
+      loading: false,
+    }
+  },
+  computed: {
+    ...mapState({
+      pageNum: state => state.borrow.pageNum,
+      pageSize: state => state.borrow.pageSize,
+      orders: state => state.borrow.orders,
+      order: state => state.borrow.order,
+    }),
   },
   methods: {
+    ...mapActions(['queryListByUser', 'queryOrder']),
+    ...mapMutations(['incrementPageNum']),
     getStatusText(status) {
       return getStatusText(status)
     },
     handleClick(borrow) {
       const query = {
-        borrow: encodeURIComponent(JSON.stringify(borrow))
-      };
+        borrow: encodeURIComponent(JSON.stringify(borrow)),
+      }
       this.$router.push({
-        name: "borrow-item",
+        name: 'borrow-item',
         params: { id: borrow.id },
-        query: query
-      });
-    }
-  }
-};
+        query: query,
+      })
+    },
+    loadMore() {
+      this.loading = true
+      this.incrementPageNum()
+      this.queryListByUser({ userNo: this.userNo })
+        .then(() => {
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+  },
+  mounted() {
+    this.queryListByUser({userNo: this.userNo})
+  },
+}
 </script>
 
 <style lang="less" scoped>
-@import "~assets/common/css/theme.less";
+@import '~assets/common/css/theme.less';
 
 @wait-pay: #4fe3c2;
 @finish: #756bff;
