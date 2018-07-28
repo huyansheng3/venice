@@ -85,7 +85,7 @@
 <script>
 import { Header, Button, Radio } from 'mint-ui'
 import { mapState, mapMutations, mapActions } from 'vuex'
-import {applyLoan} from '@/service/getData'
+import { applyLoan } from '@/service/getData'
 
 const item = {
   userNo: '11111',
@@ -113,17 +113,17 @@ export default {
       pledgeCurr: 'BTC',
       pledgeNum: 10.5,
       borrowCurr: 'ETH',
-      borrowNum: 15,
+      borrowNum: '',
       applyPledgeValue: 80000,
       applyBorrowValue: 45000,
-      borrowDays: 30,
-      entrustNum: 0.15,
-      loanNum: 14.85,
+      borrowDays: '',
       agreement: false,
     }
   },
   computed: {
     ...mapState({
+      entrustRate: state => state.pledge.entrustRate,
+      interestRate: state => state.pledge.interestRate,
       availablePledgeNum: state => state.pledge.availablePledgeNum,
       pledgeCurrList: state =>
         state.pledge.pledgeCurrList.map(item => ({
@@ -141,6 +141,12 @@ export default {
           value: item.day,
         })),
     }),
+    entrustNum() {
+      return (this.borrowNum * this.entrustRate).toFixed(1)
+    },
+    loanNum() {
+      return this.borrowNum - this.entrustNum
+    },
   },
   methods: {
     ...mapActions([
@@ -148,12 +154,34 @@ export default {
       'queryAllLoanLimit',
       'queryAllPledgeCurrList',
       'queryAvailablePledgeNum',
+      'queryEntrustRate',
+      'queryInterestRate',
     ]),
     validate() {
+      const { borrowNum, borrowDays, agreement } = this
+      let text
+      if (!borrowNum) {
+        text = '借款金额不能为空'
+      } else if (!borrowDays) {
+        text = '借款期限不能为空'
+      } else if (!agreement) {
+        text = '请同意《质押借款协议》'
+      }
+      if (text) {
+        const toast = this.$createToast({
+          txt: text,
+          type: 'error',
+          mask: true,
+          maskClosable: true
+        })
+        toast.show()
+        return false
+      }
+
       return true
     },
     async confirm() {
-      if(this.validate()) {
+      if (this.validate()) {
         await applyLoan(this.$data)
         this.$router.push({ name: 'pledgeSuccess' })
       }
@@ -166,6 +194,8 @@ export default {
     this.queryAllLoanCurrList()
     this.queryAllLoanLimit()
     this.queryAllPledgeCurrList()
+    this.queryEntrustRate()
+    this.queryInterestRate()
     this.queryAvailablePledgeNum({ curr: this.pledgeCurr })
   },
 }

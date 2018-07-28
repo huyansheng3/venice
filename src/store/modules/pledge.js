@@ -3,6 +3,8 @@ import {
   queryAllLoanLimit,
   queryAllPledgeCurrList,
   queryAvailablePledgeNum,
+  queryEntrustRate,
+  queryInterestRate,
 } from '@/service/getData'
 
 const state = {
@@ -10,6 +12,8 @@ const state = {
   loanLimit: [],
   pledgeCurrList: [],
   availablePledgeNum: '',
+  entrustRate: 0, //委托利率
+  interestRate: 0, //利息利率
 }
 
 const mutations = {
@@ -25,6 +29,12 @@ const mutations = {
   setAvailablePledgeNum(state, payload) {
     state.availablePledgeNum = payload
   },
+  setEntrustRate(state, payload){
+    state.entrustRate = payload
+  },
+  setInterestRate(state, payload){
+    state.interestRate = payload
+  }
 }
 
 const actions = {
@@ -49,6 +59,14 @@ const actions = {
   async queryAvailablePledgeNum({ state, commit }, payload) {
     const result = await queryAvailablePledgeNum(payload)
     commit('setAvailablePledgeNum', result)
+  },
+  async queryEntrustRate({ state, commit }, payload){
+    const result = await queryEntrustRate()
+    commit('setEntrustRate', result)
+  },
+  async queryInterestRate({ state, commit }, payload){
+    const result = await queryInterestRate()
+    commit('setInterestRate', result)
   },
 }
 

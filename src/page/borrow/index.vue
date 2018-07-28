@@ -43,110 +43,8 @@ import pageMixin from '../page-mixin'
 import NoBorrow from './no-borrow'
 import { mapState, mapMutations, mapActions } from 'vuex'
 
-const items = [
-  {
-    createUser: '',
-    updateUser: '',
-    id: 1,
-    orderNo: '11111_2018072712034718867409',
-    userNo: '11111',
-    pledgeCurr: 'BTC',
-    pledgeNum: 10.5,
-    borrowCurr: 'ETH',
-    borrowNum: 15,
-    applyPledgeValue: 80000,
-    applyBorrowValue: 45000,
-    loanPledgeValue: 85000.12,
-    loanBorrowValue: 48000,
-    borrowDays: 30,
-    applyDate: '2018-07-26T16:00:00.000+0000',
-    loanDate: '2018-07-26T16:00:00.000+0000',
-    entrustNum: 1.485,
-    entrustRate: 0.1,
-    loanNum: 14.85,
-    status: 'REPAYING',
-    interestRate: 0.001,
-    deadlineDate: '2018-08-25T16:00:00.000+0000',
-    mortgageRate: 0.5,
-  },
-  {
-    createUser: '',
-    updateUser: '',
-    id: 2,
-    orderNo: '11111_2018072712034718867409',
-    userNo: '11111',
-    pledgeCurr: 'BTC',
-    pledgeNum: 10.5,
-    borrowCurr: 'ETH',
-    borrowNum: 15,
-    applyPledgeValue: 80000,
-    applyBorrowValue: 45000,
-    loanPledgeValue: 85000.12,
-    loanBorrowValue: 48000,
-    borrowDays: 30,
-    applyDate: '2018-07-26T16:00:00.000+0000',
-    loanDate: '2018-07-26T16:00:00.000+0000',
-    entrustNum: 1.485,
-    entrustRate: 0.1,
-    loanNum: 14.85,
-    status: 'COMPLETED',
-    interestRate: 0.001,
-    deadlineDate: '2018-08-25T16:00:00.000+0000',
-    mortgageRate: 0.5,
-  },
-  {
-    createUser: '',
-    updateUser: '',
-    id: 3,
-    orderNo: '11111_2018072712034718867409',
-    userNo: '11111',
-    pledgeCurr: 'BTC',
-    pledgeNum: 10.5,
-    borrowCurr: 'ETH',
-    borrowNum: 15,
-    applyPledgeValue: 80000,
-    applyBorrowValue: 45000,
-    loanPledgeValue: 85000.12,
-    loanBorrowValue: 48000,
-    borrowDays: 30,
-    applyDate: '2018-07-26T16:00:00.000+0000',
-    loanDate: '2018-07-26T16:00:00.000+0000',
-    entrustNum: 1.485,
-    entrustRate: 0.1,
-    loanNum: 14.85,
-    status: 'LIQUIDATED',
-    interestRate: 0.001,
-    deadlineDate: '2018-08-25T16:00:00.000+0000',
-    mortgageRate: 0.5,
-  },
-  {
-    createUser: '',
-    updateUser: '',
-    id: 4,
-    orderNo: '11111_2018072712034718867409',
-    userNo: '11111',
-    pledgeCurr: 'BTC',
-    pledgeNum: 10.5,
-    borrowCurr: 'ETH',
-    borrowNum: 15,
-    applyPledgeValue: 80000,
-    applyBorrowValue: 45000,
-    loanPledgeValue: 85000.12,
-    loanBorrowValue: 48000,
-    borrowDays: 30,
-    applyDate: '2018-07-26T16:00:00.000+0000',
-    loanDate: '2018-07-26T16:00:00.000+0000',
-    entrustNum: 1.485,
-    entrustRate: 0.1,
-    loanNum: 14.85,
-    status: 'OVERDUED',
-    interestRate: 0.001,
-    deadlineDate: '2018-08-25T16:00:00.000+0000',
-    mortgageRate: 0.5,
-  },
-]
-
 export const statusMap = {
+  APPLYING: '申请中',
   REPAYING: '待还款',
   COMPLETED: '已完成',
   LIQUIDATED: '已平仓',
@@ -207,7 +105,7 @@ export default {
     },
   },
   mounted() {
-    this.queryListByUser({userNo: this.userNo})
+    this.queryListByUser({ userNo: this.userNo })
   },
 }
 </script>
@@ -220,6 +118,11 @@ export default {
 @close-out: #f5a622;
 @overdue: #ec5b6c;
 
+.APPLYING {
+  .status {
+    background-color: @wait-pay;
+  }
+}
 .REPAYING {
   .status {
     background-color: @wait-pay;

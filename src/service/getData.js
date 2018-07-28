@@ -11,6 +11,8 @@ export const getUserInfo = (data) => http.require({api: '/api/member/GetUserInfo
 // GET /swftConfig/queryAllLoanLimit
 // GET /swftConfig/queryAllPledgeCurrList
 // GET /swftConfig/queryAvailablePledgeNum
+// GET /swftConfig/queryEntrustRate
+// GET /swftConfig/queryInterestRate
 
 // pledge
 const swiftConfigPrefix = '/venice-swift/swftConfig'
@@ -18,6 +20,8 @@ export const queryAllLoanCurrList = () => http.require({api: `${swiftConfigPrefi
 export const queryAllLoanLimit = () => http.require({api: `${swiftConfigPrefix}/queryAllLoanLimit`, method: 'GET'}); 
 export const queryAllPledgeCurrList = () => http.require({api: `${swiftConfigPrefix}/queryAllPledgeCurrList`, method: 'GET'}); 
 export const queryAvailablePledgeNum = (params) => http.require({api: `${swiftConfigPrefix}/queryAvailablePledgeNum`, method: 'GET', params}); 
+export const queryEntrustRate = () => http.require({api: `${swiftConfigPrefix}/queryEntrustRate`, method: 'GET'}); 
+export const queryInterestRate = () => http.require({api: `${swiftConfigPrefix}/queryInterestRate`, method: 'GET'}); 
 
 // POST /tradeOrder/applyLoan
 // POST /tradeOrder/changeStatus

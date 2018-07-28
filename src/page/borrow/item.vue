@@ -23,22 +23,22 @@
 </template>
 
 <script>
-import { Header, Button, Cell } from "mint-ui";
-import pageMixin from "../page-mixin";
-import { getStatusText } from "./index";
-import Vue from "vue";
-import REPAYING from "./REPAYING.svg";
-import COMPLETED from "./COMPLETED.svg";
-import LIQUIDATED from "./LIQUIDATED.svg";
-import OVERDUED from "./OVERDUED.svg";
-import {mapActions, mapState, mapMutations} from 'vuex'
+import { Header, Button, Cell } from 'mint-ui'
+import pageMixin from '../page-mixin'
+import { getStatusText, statusMap } from './index'
+import Vue from 'vue'
+import REPAYING from './REPAYING.svg'
+import COMPLETED from './COMPLETED.svg'
+import LIQUIDATED from './LIQUIDATED.svg'
+import OVERDUED from './OVERDUED.svg'
+import { mapActions, mapState, mapMutations } from 'vuex'
 
 const imgMap = {
   REPAYING,
   COMPLETED,
   LIQUIDATED,
-  OVERDUED
-};
+  OVERDUED,
+}
 // createUser: "",
 // updateUser: "",
 // id: 3,
@@ -65,63 +65,70 @@ const imgMap = {
 
 const list = borrow => [
   {
-    label: "申请日期：",
-    value: borrow.applyDate
+    label: '申请日期：',
+    value: borrow.applyDate,
   },
   {
-    label: "质押币种：",
-    value: borrow.pledgeCurr
+    label: '质押币种：',
+    value: borrow.pledgeCurr,
   },
   {
-    label: "质押数量：",
-    value: borrow.pledgeNum
+    label: '质押数量：',
+    value: borrow.pledgeNum,
   },
   {
-    label: "借贷币种：",
-    value: borrow.borrowCurr
+    label: '借贷币种：',
+    value: borrow.borrowCurr,
   },
   {
-    label: "借贷数量：",
-    value: borrow.borrowNum
+    label: '借贷数量：',
+    value: borrow.borrowNum,
   },
   {
-    label: "托管费用：",
-    value: borrow.entrustNum
-  },
-
-  {
-    label: "等价USDT：",
-    value: ""
+    label: '托管费用：',
+    value: borrow.entrustNum,
   },
   {
-    label: "借款期限：",
-    value: borrow.borrowDays
+    label: '等价USDT：',
+    value: '',
   },
   {
-    label: "利息：",
-    value: ""
+    label: '借款期限：',
+    value: borrow.borrowDays,
   },
   {
-    label: "到期应还：",
-    value: ""
+    label: '利息：',
+    value: '',
   },
   {
-    label: "应还时间：",
-    value: borrow.deadlineDate
+    label: '到期应还：',
+    value: '',
   },
   {
-    label: "逾期费用：",
-    value: borrow.deadlineDate
+    label: '应还时间：',
+    value: borrow.deadlineDate,
   },
+  borrow.status === statusMap.OVERDUED
+    ? {
+        label: '逾期费用：',
+        value: borrow.deadlineDate,
+      }
+    : null,
+  borrow.status === statusMap.LIQUIDATED
+    ? {
+        label: '平仓价格：',
+        value: borrow.deadlineDate,
+      }
+    : null,
   {
-    label: "订单状态：",
+    label: '订单状态：',
     status: borrow.status,
-    value: getStatusText(borrow.status)
-  }
-];
+    value: getStatusText(borrow.status),
+  },
+]
 
-function getStatusImg(status = "REPAYING") {
-  return imgMap[status];
+function getStatusImg(status = 'REPAYING') {
+  return imgMap[status]
 }
 
 export default {
@@ -129,43 +136,44 @@ export default {
   components: {
     Header,
     Button,
-    Cell
+    Cell,
   },
   data() {
-    return {
-    };
+    return {}
   },
   computed: {
-    ...mapState(['order']),
+    ...mapState({
+      order: state => state.borrow.order,
+    }),
     borrowList() {
-      return list(this.order);
+      return list(this.order)
     },
     statusImg() {
-      return getStatusImg(this.order.status);
-    }
+      return getStatusImg(this.order.status)
+    },
   },
   methods: {
     ...mapMutations(['setOrder']),
     ...mapActions(['queryOrder']),
   },
   created() {
-    const { borrow } = this.$route.query;
+    const { borrow } = this.$route.query
     try {
-      const initBorrow = JSON.parse(decodeURIComponent(borrow));
+      const initBorrow = JSON.parse(decodeURIComponent(borrow))
       this.setOrder(initBorrow)
     } catch (e) {
-      console.error(e);
+      console.error(e)
     }
   },
   mounted() {
-    const {id} = this.$route.params
-    this.queryOrder({id});
-  }
-};
+    const { id } = this.$route.params
+    this.queryOrder({ id })
+  },
+}
 </script>
 
 <style lang="less" scoped>
-@import "~assets/common/css/theme.less";
+@import '~assets/common/css/theme.less';
 
 @wait-pay: #4fe3c2;
 @finish: #756bff;
