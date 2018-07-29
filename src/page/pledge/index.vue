@@ -26,7 +26,7 @@
                 <div class="borrow-container">
                   <div class="borrow-input">
                     <cube-input v-model="borrowNum" type="number">
-                      <cube-select class="borrow-curr-select" slot="append" v-model="borrowCurr" :options="loanCurrList"></cube-select>
+                      <cube-select class="borrow-curr-select" placeholder="" slot="append" v-model="borrowCurr" :options="loanCurrList"></cube-select>
                     </cube-input> 
                   </div>
                   
