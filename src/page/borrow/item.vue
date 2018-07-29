@@ -6,7 +6,7 @@
     <section class="main">
       <section class="borrow">
         <ul class="list">
-          <li class="item" v-for="item in borrowList" :key="item.label">
+          <li class="item" v-for="item in borrowList" v-if="item" :key="item.label">
             <span>
               {{item.label}}
             </span>
@@ -17,6 +17,15 @@
         </ul>
 
         <img class="status-img" :src="statusImg" alt="status">
+      </section>
+
+      <section v-if="isRepaying" class="repaying">
+        <div class="money">
+          还款金额: 6002 {{repayCurrency}}
+        </div>
+
+        <cube-select class="currency" v-model="repayCurrency" :options="loanCurrList"></cube-select>
+
       </section>
     </section>
   </section>
@@ -31,9 +40,12 @@ import REPAYING from './REPAYING.svg'
 import COMPLETED from './COMPLETED.svg'
 import LIQUIDATED from './LIQUIDATED.svg'
 import OVERDUED from './OVERDUED.svg'
+import APPLYING from './APPLYING.svg'
 import { mapActions, mapState, mapMutations } from 'vuex'
+import { dateFormat } from '@/utils/filters'
 
 const imgMap = {
+  APPLYING,
   REPAYING,
   COMPLETED,
   LIQUIDATED,
@@ -66,7 +78,7 @@ const imgMap = {
 const list = borrow => [
   {
     label: '申请日期：',
-    value: borrow.applyDate,
+    value: dateFormat(borrow.applyDate, 'yyyy/MM/dd'),
   },
   {
     label: '质押币种：',
@@ -82,7 +94,7 @@ const list = borrow => [
   },
   {
     label: '借贷数量：',
-    value: borrow.borrowNum,
+    value: `${borrow.borrowNum} （到账 ${borrow.loanNum}）`,
   },
   {
     label: '托管费用：',
@@ -90,23 +102,23 @@ const list = borrow => [
   },
   {
     label: '等价USDT：',
-    value: '',
+    value: borrow.applyBorrowValue + 'USDT',
   },
   {
     label: '借款期限：',
-    value: borrow.borrowDays,
+    value: `${borrow.borrowDays}天`,
   },
   {
     label: '利息：',
-    value: '',
+    value: borrow.applyBorrowValue * borrow.interestRate + 'USDT',
   },
   {
     label: '到期应还：',
-    value: '',
+    value: borrow.loanBorrowValue + 'USDT（或等价 ETH）',
   },
   {
     label: '应还时间：',
-    value: borrow.deadlineDate,
+    value: dateFormat(borrow.deadlineDate, 'yyyy/MM/dd'),
   },
   borrow.status === statusMap.OVERDUED
     ? {
@@ -139,11 +151,18 @@ export default {
     Cell,
   },
   data() {
-    return {}
+    return {
+      repayCurrency: '',
+    }
   },
   computed: {
     ...mapState({
       order: state => state.borrow.order,
+      loanCurrList: state =>
+        state.pledge.loanCurrList.map(item => ({
+          text: item.curr,
+          value: item.curr,
+        })),
     }),
     borrowList() {
       return list(this.order)
@@ -151,10 +170,13 @@ export default {
     statusImg() {
       return getStatusImg(this.order.status)
     },
+    isRepaying() {
+      return this.order.status === 'REPAYING'
+    },
   },
   methods: {
     ...mapMutations(['setOrder']),
-    ...mapActions(['queryOrder']),
+    ...mapActions(['queryOrder', 'queryAllLoanCurrList']),
   },
   created() {
     const { borrow } = this.$route.query
@@ -168,6 +190,7 @@ export default {
   mounted() {
     const { id } = this.$route.params
     this.queryOrder({ id })
+    this.queryAllLoanCurrList()
   },
 }
 </script>
@@ -175,6 +198,7 @@ export default {
 <style lang="less" scoped>
 @import '~assets/common/css/theme.less';
 
+@applying: #4a90e2;
 @wait-pay: #4fe3c2;
 @finish: #756bff;
 @close-out: #f5a622;
@@ -197,6 +221,9 @@ export default {
         .item {
           padding: 5px 0;
 
+          .status.APPLYING {
+            color: @applying;
+          }
           .status.REPAYING {
             color: @wait-pay;
           }
@@ -217,6 +244,28 @@ export default {
         width: 90px;
         top: 0;
         right: 0;
+      }
+    }
+
+    .repaying {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+
+      .money,
+      .currency {
+        background: #ffffff;
+        box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+      }
+      .money {
+        flex: 2;
+        margin-right: 10px;
+        line-height: 40px;
+        text-align: center;
+      }
+      .currency {
+        flex: 1;
       }
     }
   }

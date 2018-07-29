@@ -172,7 +172,7 @@ export default {
           txt: text,
           type: 'error',
           mask: true,
-          maskClosable: true
+          maskClosable: true,
         })
         toast.show()
         return false
@@ -182,7 +182,8 @@ export default {
     },
     async confirm() {
       if (this.validate()) {
-        await applyLoan(this.$data)
+        const { entrustNum, loanNum } = this
+        await applyLoan({ ...this.$data, entrustNum, loanNum })
         this.$router.push({ name: 'pledgeSuccess' })
       }
     },
