@@ -25,8 +25,10 @@
         </div>
 
         <cube-select class="currency" v-model="repayCurrency" :options="loanCurrList"></cube-select>
-
       </section>
+
+
+      <mt-button v-if="isRepaying" class="repay_btn" type="primary">立即还款</mt-button>
     </section>
   </section>
 </template>
@@ -267,6 +269,13 @@ export default {
       .currency {
         flex: 1;
       }
+    }
+
+    .repay_btn {
+      width: 80%;
+      margin: 0 auto;
+      display: block;
+      margin-top: 35px;
     }
   }
 }
