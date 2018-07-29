@@ -1,1 +1,0 @@
-webpackJsonp([0],{gcei:function(t,o,i){"use strict";o.a={methods:{goBack:function(){window.history.length>1?this.$router.go(-1):this.$router.push("/")}}}}});

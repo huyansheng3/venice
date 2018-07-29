@@ -1,0 +1,1 @@
+webpackJsonp([0],{gcei:function(e,t,o){"use strict";t.a={methods:{goBack:function(){window.history.length>1?this.$router.go(-1):this.$router.push("/")}},computed:{hideHeader:function(){var e=this.$route.query.hideHeader;return Boolean(Number(e))}}}}});
