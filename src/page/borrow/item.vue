@@ -19,16 +19,16 @@
         <img class="status-img" :src="statusImg" alt="status">
       </section>
 
-      <section v-if="isRepaying" class="repaying">
+      <section v-if="isRepaying && !paySuccess" class="repaying">
         <div class="money">
-          还款金额: 6002 {{repayCurrency}}
+          还款金额: {{order.payableAmount}} {{repayCurrency}}
         </div>
 
-        <cube-select class="currency" v-model="repayCurrency" :options="loanCurrList"></cube-select>
+        <cube-select class="currency" v-model="repayCurrency" :options="currList"></cube-select>
       </section>
 
 
-      <mt-button v-if="isRepaying" class="repay_btn" type="primary">立即还款</mt-button>
+      <mt-button v-if="isRepaying && !paySuccess" @click="repay" class="repay_btn" type="primary">立即还款</mt-button>
     </section>
   </section>
 </template>
@@ -45,6 +45,7 @@ import OVERDUED from './OVERDUED.svg'
 import APPLYING from './APPLYING.svg'
 import { mapActions, mapState, mapMutations } from 'vuex'
 import { dateFormat } from '@/utils/filters'
+import { changeStatus } from '@/service/getData'
 
 const imgMap = {
   APPLYING,
@@ -154,17 +155,13 @@ export default {
   },
   data() {
     return {
-      repayCurrency: '',
+      repayCurrency: 'USDT',
+      paySuccess: false,
     }
   },
   computed: {
     ...mapState({
       order: state => state.borrow.order,
-      loanCurrList: state =>
-        state.pledge.loanCurrList.map(item => ({
-          text: item.curr,
-          value: item.curr,
-        })),
     }),
     borrowList() {
       return list(this.order)
@@ -175,10 +172,27 @@ export default {
     isRepaying() {
       return this.order.status === 'REPAYING'
     },
+    currList() {
+      return ['USDT']
+    },
   },
   methods: {
     ...mapMutations(['setOrder']),
-    ...mapActions(['queryOrder', 'queryAllLoanCurrList']),
+    ...mapActions(['queryOrder']),
+    repay() {
+      return changeStatus({ ...this.order, status: 'REPAYING' })
+        .then(data => {
+          const toast = this.$createToast({
+            type:'correct',
+            txt: '还款成功',
+          })
+          toast.show()
+          this.paySuccess = true
+        })
+        .catch(e => {
+          console.error(e)
+        })
+    },
   },
   created() {
     const { borrow } = this.$route.query
@@ -192,7 +206,6 @@ export default {
   mounted() {
     const { id } = this.$route.params
     this.queryOrder({ id })
-    this.queryAllLoanCurrList()
   },
 }
 </script>

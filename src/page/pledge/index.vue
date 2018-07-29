@@ -12,7 +12,7 @@
               <div class="pledge-select" >
                 <cube-select @change="handlePledgeCurrChange" v-model="pledgeCurr" :options="pledgeCurrList"></cube-select>
                 <p>
-                  1BTC=44437.67CNY
+                  1{{pledgeCurr}}={{usdtUnit}}USDT
                 </p>
               </div>
             
@@ -33,7 +33,7 @@
                   <img  src="./exchange.png" alt="exchange">
 
                   <div class="borrow-input" >
-                    <cube-input :placeholder="`质押数量：2${pledgeCurr}`" type="number"  :disabled="true"></cube-input>          
+                    <cube-input :placeholder="`质押${pledgeNum}${pledgeCurr}`" type="number"  :disabled="true"></cube-input>          
                   </div>
                 </div>
                 
@@ -70,13 +70,15 @@
 
         <mt-button @click="confirm" class="button" type="primary">确认</mt-button>
 
-        <cube-checkbox class="agreement" v-model="agreement">
+        <div class="agreement">
+          <cube-checkbox  v-model="agreement">
           <div class="agreement-text">
             我已阅读并同意
-            <router-link to="/pledge/agreement">《质押借款协议》</router-link>
           </div>
         </cube-checkbox>
-
+        <router-link class="link" to="/pledge/agreement">《质押借款协议》</router-link>
+        </div>
+        
       </section>
     </section>
   </section>
@@ -85,7 +87,13 @@
 <script>
 import { Header, Button, Radio } from 'mint-ui'
 import { mapState, mapMutations, mapActions } from 'vuex'
-import { applyLoan } from '@/service/getData'
+import {
+  applyLoan,
+  queryTransUnitUSDT,
+  queryPledgeNum,
+} from '@/service/getData'
+import pageMixin from '../page-mixin'
+import { debounce } from 'lodash'
 
 const item = {
   userNo: '11111',
@@ -102,6 +110,7 @@ const item = {
 
 export default {
   name: 'Pledge',
+  mixins: [pageMixin],
   components: {
     Header,
     Button,
@@ -118,7 +127,20 @@ export default {
       applyBorrowValue: 45000,
       borrowDays: '',
       agreement: false,
+      usdtUnit: null,
     }
+  },
+  watch: {
+    pledgeCurr(newValue, oldValue) {
+      this.queryTransUnitUSDT()
+      this.debounceQueryPledgeNum()
+    },
+    borrowCurr(newValue, oldValue) {
+      this.debounceQueryPledgeNum()
+    },
+    borrowNum(newValue, oldValue) {
+      this.debounceQueryPledgeNum()
+    },
   },
   computed: {
     ...mapState({
@@ -147,6 +169,10 @@ export default {
     loanNum() {
       return this.borrowNum - this.entrustNum
     },
+    shouldReturnValue() {
+      return (this.pledgeNum * this.usdtUnit * (1 + interestRate)).toFixed(2)
+    }
+    
   },
   methods: {
     ...mapActions([
@@ -190,6 +216,21 @@ export default {
     handlePledgeCurrChange(value) {
       this.queryAvailablePledgeNum({ curr: value })
     },
+    async queryTransUnitUSDT() {
+      const result = await queryTransUnitUSDT({ curr: this.pledgeCurr })
+      this.usdtUnit = result
+    },
+    queryPledgeNum() {
+      const { borrowCurr, borrowNum, pledgeCurr } = this
+      return queryPledgeNum({ borrowCurr, borrowNum, pledgeCurr }).then(
+        data => {
+          this.pledgeNum = data
+        }
+      )
+    },
+  },
+  created() {
+    this.debounceQueryPledgeNum = debounce(this.queryPledgeNum, 50)
   },
   mounted() {
     this.queryAllLoanCurrList()
@@ -198,6 +239,7 @@ export default {
     this.queryEntrustRate()
     this.queryInterestRate()
     this.queryAvailablePledgeNum({ curr: this.pledgeCurr })
+    this.queryTransUnitUSDT()
   },
 }
 </script>
@@ -273,9 +315,16 @@ export default {
       .agreement {
         margin-top: 22px;
         font-size: 14px;
+        position: relative;
         .cube-checkbox-wrap {
           margin: 0 auto;
           width: 80%;
+        }
+        .link {
+          position: absolute;
+          right: 60px;
+          top: 15px;
+          z-index: 1;
         }
       }
 

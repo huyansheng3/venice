@@ -47,31 +47,26 @@ const appRouter = {
                 path: '/pledge',
                 name: 'pledge',
                 component: Pledge,
-                meta: { keepAlive: true }
             },
             {
                 path: '/pledge/agreement',
                 name: 'pledgeAgreement',
                 component: PledgeAgreement,
-                meta: { keepAlive: true }
             },
             {
                 path: '/pledge/success',
                 name: 'pledgeSuccess',
                 component: PledgeSuccess,
-                meta: { keepAlive: true }
             },
             {
                 path: '/borrow-list',
                 name: 'borrow-list',
                 component: BorrowList,
-                meta: { keepAlive: true }
             },
             {
                 path: '/borrow-list/:id',
                 name: 'borrow-item',
                 component: BorrowItem,
-                meta: { keepAlive: false }
             },
             // {
             //     path: '/index',

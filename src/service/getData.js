@@ -28,11 +28,18 @@ export const queryInterestRate = () => http.require({api: `${swiftConfigPrefix}/
 // POST /tradeOrder/confirmLoan
 // POST /tradeOrder/queryListByUser
 // GET /tradeOrder/queryOrder
+// POST /tradeOrder/queryPledgeNum
 const tradeOrderPrefix = '/venice-swift/tradeOrder'
 // borrow
 export const applyLoan = (data) => http.require({api: `${tradeOrderPrefix}/applyLoan`,data}); 
 export const changeStatus = (data) => http.require({api: `${tradeOrderPrefix}/changeStatus`,data}); 
 export const confirmLoan = (data) => http.require({api: `${tradeOrderPrefix}/confirmLoan`,data}); 
 export const queryListByUser = (data) => http.require({api: `${tradeOrderPrefix}/queryListByUser`,data}); 
+export const queryPledgeNum = (data) => http.require({api: `${tradeOrderPrefix}/queryPledgeNum`,data}); 
 export const queryOrder = (params) => http.require({api: `${tradeOrderPrefix}/queryOrder`, method:'GET', params}); 
 
+
+
+// GET /swftApi/queryTransUnitUSDT
+const swiftApi = '/venice-swift/swftApi'
+export const queryTransUnitUSDT = (params) => http.require({api: `${swiftApi}/queryTransUnitUSDT`, method:'GET', params}); 
