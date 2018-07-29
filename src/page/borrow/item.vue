@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <mt-header title="我的借款">
+    <mt-header  v-if="!hideHeader" title="我的借款">
       <mt-button @click="goBack" slot="left" icon="back"></mt-button>
     </mt-header>
     <section class="main">

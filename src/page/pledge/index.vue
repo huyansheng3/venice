@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <mt-header title="SWFT"></mt-header>
+    <mt-header v-if="!hideHeader" title="SWFT"></mt-header>
     <section class="main">
       <img class="banner" src="./banner.jpg" alt="banner">
 

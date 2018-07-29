@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <mt-header title="提交成功">
+    <mt-header v-if="!hideHeader" title="提交成功">
       <mt-button @click="goBack" slot="left" icon="back"></mt-button>
     </mt-header>
     <section class="main">

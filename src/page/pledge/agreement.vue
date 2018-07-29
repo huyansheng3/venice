@@ -1,6 +1,6 @@
 <template>
   <section class="container">
-    <mt-header title="借款及担保协议">
+    <mt-header v-if="!hideHeader" title="借款及担保协议">
       <mt-button @click="goBack" slot="left" icon="back"></mt-button>
     </mt-header>
     <section class="main">
