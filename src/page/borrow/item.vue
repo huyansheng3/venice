@@ -21,7 +21,7 @@
 
       <section v-if="isRepaying && !paySuccess" class="repaying">
         <div class="money">
-          还款金额: {{order.payableAmount}} {{repayCurrency}}
+          还款金额: {{repayNumber}} {{repayCurrency}}
         </div>
 
         <cube-select class="currency" v-model="repayCurrency" :options="currList"></cube-select>
@@ -38,14 +38,14 @@ import { Header, Button, Cell } from 'mint-ui'
 import pageMixin from '../page-mixin'
 import { getStatusText, statusMap } from './index'
 import Vue from 'vue'
-import REPAYING from './REPAYING.svg'
-import COMPLETED from './COMPLETED.svg'
-import LIQUIDATED from './LIQUIDATED.svg'
-import OVERDUED from './OVERDUED.svg'
-import APPLYING from './APPLYING.svg'
+import REPAYING from './REPAYING.png'
+import COMPLETED from './COMPLETED.png'
+import LIQUIDATED from './LIQUIDATED.png'
+import OVERDUED from './OVERDUED.png'
+import APPLYING from './APPLYING.png'
 import { mapActions, mapState, mapMutations } from 'vuex'
 import { dateFormat } from '@/utils/filters'
-import { changeStatus } from '@/service/getData'
+import { changeStatus, queryTransUnitUSDT } from '@/service/getData'
 
 const imgMap = {
   APPLYING,
@@ -147,6 +147,7 @@ function getStatusImg(status = 'REPAYING') {
 }
 
 export default {
+  name: 'OrderDetail',
   mixins: [pageMixin],
   components: {
     Header,
@@ -173,8 +174,15 @@ export default {
       return this.order.status === 'REPAYING'
     },
     currList() {
-      return ['USDT']
+      return ['USDT', this.order.borrowCurr]
     },
+    repayNumber() {
+      if(this.repayCurrency === 'USDT') {
+        return this.order.payableAmount
+      } else {
+        return this.borrowCurrNum
+      }
+    }
   },
   methods: {
     ...mapMutations(['setOrder']),
@@ -193,6 +201,10 @@ export default {
           console.error(e)
         })
     },
+    async queryTransUnitUSDT() {
+      const result = await queryTransUnitUSDT({ curr: this.order.borrowCurr })
+      this.borrowCurrNum = (this.order.payableAmount /result).toFixed(1)
+    },
   },
   created() {
     const { borrow } = this.$route.query
@@ -206,6 +218,7 @@ export default {
   mounted() {
     const { id } = this.$route.params
     this.queryOrder({ id })
+    this.queryTransUnitUSDT()
   },
 }
 </script>

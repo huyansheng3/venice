@@ -56,6 +56,7 @@ export function getStatusText(status) {
 }
 
 export default {
+  name: 'OrderList',
   mixins: [pageMixin],
   components: {
     Button,

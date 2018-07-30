@@ -62,7 +62,7 @@
              
               <div class="pledge-select">
                 <cube-select v-model="borrowDays" :options="loanLimit"></cube-select>
-                <p>到期本息合计:4531.012 USDT(或等价ETH)</p>
+                <p>到期本息合计: {{shouldReturnValue}} USDT(或等价ETH)</p>
               </div>
             
           </div>
@@ -95,17 +95,17 @@ import {
 import pageMixin from '../page-mixin'
 import { debounce } from 'lodash'
 
-const item = {
+const defaultData = {
   userNo: '11111',
   pledgeCurr: 'BTC',
-  pledgeNum: 10.5,
+  pledgeNum: 0,
   borrowCurr: 'ETH',
-  borrowNum: 15,
-  applyPledgeValue: 80000,
-  applyBorrowValue: 45000,
-  borrowDays: 30,
-  entrustNum: 0.15,
-  loanNum: 14.85,
+  borrowNum: '',
+  applyPledgeValue: 0,
+  applyBorrowValue: 0,
+  borrowDays: '',
+  agreement: false,
+  usdtUnit: null,
 }
 
 export default {
@@ -116,15 +116,27 @@ export default {
     Button,
     Radio,
   },
+    beforeRouteEnter (to, from, next) {
+    // 在渲染该组件的对应路由被 confirm 前调用
+    // 不！能！获取组件实例 `this`
+    // 因为当守卫执行前，组件实例还没被创建
+    if(from.name === 'pledgeSuccess') {
+      next(vm=>{
+        Object.assign(vm.$data, vm.$options.data())
+      })  
+    } else {
+      next()
+    }
+  },
   data() {
     return {
       userNo: '11111',
       pledgeCurr: 'BTC',
-      pledgeNum: 10.5,
+      pledgeNum: 0,
       borrowCurr: 'ETH',
       borrowNum: '',
-      applyPledgeValue: 80000,
-      applyBorrowValue: 45000,
+      applyPledgeValue: 0,
+      applyBorrowValue: 0,
       borrowDays: '',
       agreement: false,
       usdtUnit: null,
@@ -170,9 +182,8 @@ export default {
       return this.borrowNum - this.entrustNum
     },
     shouldReturnValue() {
-      return (this.pledgeNum * this.usdtUnit * (1 + interestRate)).toFixed(2)
+      return (this.borrowNum * this.usdtUnit * (1 + this.interestRate)).toFixed(2)
     }
-    
   },
   methods: {
     ...mapActions([
@@ -222,11 +233,13 @@ export default {
     },
     queryPledgeNum() {
       const { borrowCurr, borrowNum, pledgeCurr } = this
-      return queryPledgeNum({ borrowCurr, borrowNum, pledgeCurr }).then(
-        data => {
-          this.pledgeNum = data
-        }
-      )
+      if(borrowCurr && borrowNum && pledgeCurr) {
+        return queryPledgeNum({ borrowCurr, borrowNum, pledgeCurr }).then(
+          data => {
+            this.pledgeNum = data
+          }
+        )
+      }
     },
   },
   created() {
@@ -295,11 +308,18 @@ export default {
             display: flex;
             justify-content: space-around;
             align-items: center;
-
+            
+            .borrow-tip {
+              flex: 3;
+            }
+            .available-pledge-num {
+              flex: 3;
+              margin-left: 20px;
+            }
             .borrow-tip,
             .available-pledge-num {
               margin-top: 10px;
-              text-align: center;
+              text-align: left;
             }
 
             .borrow-tip {

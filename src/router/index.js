@@ -47,6 +47,7 @@ const appRouter = {
                 path: '/pledge',
                 name: 'pledge',
                 component: Pledge,
+                meta: { keepAlive: true }
             },
             {
                 path: '/pledge/agreement',
