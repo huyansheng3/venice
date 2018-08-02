@@ -44,6 +44,7 @@ import NoBorrow from './no-borrow'
 import { mapState, mapMutations, mapActions } from 'vuex'
 
 export const statusMap = {
+  LOANING: '放款中',
   APPLYING: '审核中',
   REPAYING: '待还款',
   COMPLETED: '已完成',
@@ -114,17 +115,25 @@ export default {
 <style lang="less" scoped>
 @import '~assets/common/css/theme.less';
 
-@applying: #4A90E2;
+@loading: #50e3c2;
+@applying: #4a90e2;
 @wait-pay: #4fe3c2;
 @finish: #756bff;
 @close-out: #f5a622;
 @overdue: #ec5b6c;
+
+.LOANING {
+  .status {
+    background-color: @loading;
+  }
+}
 
 .APPLYING {
   .status {
     background-color: @applying;
   }
 }
+
 .REPAYING {
   .status {
     background-color: @wait-pay;

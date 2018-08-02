@@ -2,7 +2,7 @@ var express = require('express');
 var compression = require('compression');
 var connectHistoryApiFallback = require('connect-history-api-fallback');
 
-var port = process.env.PORT || 6773;
+var port = process.env.PORT || process.env.LEANCLOUD_APP_PORT;
 
 var app = express();
 

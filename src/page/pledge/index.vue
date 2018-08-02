@@ -10,7 +10,7 @@
             <label for="pledgeCurr">
               <span>质押币种</span></label>
               <div class="pledge-select" >
-                <cube-select @change="handlePledgeCurrChange" v-model="pledgeCurr" :options="pledgeCurrList"></cube-select>
+                <cube-select @change="handlePledgeCurrChange" v-model="pledgeCurr" :options="currList"></cube-select>
                 <p>
                   1{{pledgeCurr}}={{usdtUnit}}USDT
                 </p>
@@ -26,29 +26,29 @@
                 <div class="borrow-container">
                   <div class="borrow-input">
                     <cube-input v-model="borrowNum" type="number">
-                      <cube-select class="borrow-curr-select" placeholder="" slot="append" v-model="borrowCurr" :options="loanCurrList"></cube-select>
+                      <cube-select class="borrow-curr-select" placeholder="" slot="append" v-model="borrowCurr" :options="currList"></cube-select>
                     </cube-input> 
                   </div>
                   
                   <img  src="./exchange.png" alt="exchange">
 
                   <div class="borrow-input" >
-                    <cube-input :placeholder="`质押${pledgeNum}${pledgeCurr}`" type="number"  :disabled="true"></cube-input>          
+                    <cube-input :placeholder="`质押${pledgeNum}`" type="number"  :disabled="true"></cube-input>          
                   </div>
                 </div>
                 
                 <div class="borrow-tip-conatiner">
                   <div class="borrow-tip">
                       <p>
-                        委托费：{{entrustNum}}{{borrowCurr}}
+                        委托费:{{entrustNum}}{{borrowCurr}}
                       </p>
                       <p>
-                        实际到账：{{loanNum}}{{borrowCurr}}
+                        实际到账:{{loanNum}}{{borrowCurr}}
                       </p>
                     </div>
 
                     <p class="available-pledge-num">
-                      可用数量：{{availablePledgeNum}} {{pledgeCurr}}
+                      可用数量:{{availablePledgeNum}} {{pledgeCurr}}
                     </p>
                 </div>
             </div>
@@ -116,14 +116,14 @@ export default {
     Button,
     Radio,
   },
-    beforeRouteEnter (to, from, next) {
+  beforeRouteEnter(to, from, next) {
     // 在渲染该组件的对应路由被 confirm 前调用
     // 不！能！获取组件实例 `this`
     // 因为当守卫执行前，组件实例还没被创建
-    if(from.name === 'pledgeSuccess') {
-      next(vm=>{
+    if (from.name === 'pledgeSuccess') {
+      next(vm => {
         Object.assign(vm.$data, vm.$options.data())
-      })  
+      })
     } else {
       next()
     }
@@ -159,16 +159,7 @@ export default {
       entrustRate: state => state.pledge.entrustRate,
       interestRate: state => state.pledge.interestRate,
       availablePledgeNum: state => state.pledge.availablePledgeNum,
-      pledgeCurrList: state =>
-        state.pledge.pledgeCurrList.map(item => ({
-          text: `${item.remark} (${item.curr})`,
-          value: item.curr,
-        })),
-      loanCurrList: state =>
-        state.pledge.loanCurrList.map(item => ({
-          text: item.curr,
-          value: item.curr,
-        })),
+      currList: state => state.pledge.currList,
       loanLimit: state =>
         state.pledge.loanLimit.map(item => ({
           text: `${item.day}天`,
@@ -176,20 +167,21 @@ export default {
         })),
     }),
     entrustNum() {
-      return (this.borrowNum * this.entrustRate).toFixed(1)
+      return (this.borrowNum * this.entrustRate).toFixed(8)
     },
     loanNum() {
-      return this.borrowNum - this.entrustNum
+      return (this.borrowNum - this.entrustNum).toFixed(8)
     },
     shouldReturnValue() {
-      return (this.borrowNum * this.usdtUnit * (1 + this.interestRate)).toFixed(2)
-    }
+      return (this.borrowNum * this.usdtUnit * (1 + this.interestRate)).toFixed(
+        3
+      )
+    },
   },
   methods: {
     ...mapActions([
-      'queryAllLoanCurrList',
       'queryAllLoanLimit',
-      'queryAllPledgeCurrList',
+      'queryCurrList',
       'queryAvailablePledgeNum',
       'queryEntrustRate',
       'queryInterestRate',
@@ -233,7 +225,7 @@ export default {
     },
     queryPledgeNum() {
       const { borrowCurr, borrowNum, pledgeCurr } = this
-      if(borrowCurr && borrowNum && pledgeCurr) {
+      if (borrowCurr && borrowNum && pledgeCurr) {
         return queryPledgeNum({ borrowCurr, borrowNum, pledgeCurr }).then(
           data => {
             this.pledgeNum = data
@@ -246,9 +238,8 @@ export default {
     this.debounceQueryPledgeNum = debounce(this.queryPledgeNum, 50)
   },
   mounted() {
-    this.queryAllLoanCurrList()
     this.queryAllLoanLimit()
-    this.queryAllPledgeCurrList()
+    this.queryCurrList()
     this.queryEntrustRate()
     this.queryInterestRate()
     this.queryAvailablePledgeNum({ curr: this.pledgeCurr })
@@ -277,6 +268,7 @@ export default {
           label {
             flex: 1;
             line-height: 37px;
+            white-space: nowrap;
           }
           .pledge-select,
           .borrow {
@@ -307,14 +299,15 @@ export default {
           .borrow-tip-conatiner {
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            
+            align-items: top;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+
             .borrow-tip {
               flex: 3;
             }
             .available-pledge-num {
               flex: 3;
-              margin-left: 20px;
             }
             .borrow-tip,
             .available-pledge-num {
@@ -322,10 +315,15 @@ export default {
               text-align: left;
             }
 
+            .available-pledge-num {
+              font-size: 0.8em;
+            }
+
             .borrow-tip {
               white-space: nowrap;
               p {
                 text-align: left;
+                font-size: 0.8em;
               }
             }
           }

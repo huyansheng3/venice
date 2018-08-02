@@ -43,11 +43,13 @@ import COMPLETED from './COMPLETED.png'
 import LIQUIDATED from './LIQUIDATED.png'
 import OVERDUED from './OVERDUED.png'
 import APPLYING from './APPLYING.png'
+import LOANING from './LOANING.png'
 import { mapActions, mapState, mapMutations } from 'vuex'
 import { dateFormat } from '@/utils/filters'
 import { changeStatus, queryTransUnitUSDT } from '@/service/getData'
 
 const imgMap = {
+  LOANING,
   APPLYING,
   REPAYING,
   COMPLETED,
@@ -226,6 +228,7 @@ export default {
 <style lang="less" scoped>
 @import '~assets/common/css/theme.less';
 
+@loading: #50e3c2;
 @applying: #4a90e2;
 @wait-pay: #4fe3c2;
 @finish: #756bff;
@@ -249,6 +252,9 @@ export default {
         .item {
           padding: 5px 0;
 
+           .status.LOANING {
+            color: @loading;
+          }
           .status.APPLYING {
             color: @applying;
           }

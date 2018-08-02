@@ -1,30 +1,25 @@
 import {
-  queryAllLoanCurrList,
   queryAllLoanLimit,
-  queryAllPledgeCurrList,
+  queryCurrList,
   queryAvailablePledgeNum,
   queryEntrustRate,
   queryInterestRate,
 } from '@/service/getData'
 
 const state = {
-  loanCurrList: [],
   loanLimit: [],
-  pledgeCurrList: [],
+  currList: [],
   availablePledgeNum: '',
   entrustRate: 0, //委托利率
   interestRate: 0, //利息利率
 }
 
 const mutations = {
-  setAllLoanCurrList(state, payload) {
-    state.loanCurrList = payload
-  },
   setAllLoanLimit(state, payload) {
     state.loanLimit = payload
   },
-  setAllPledgeCurrList(state, payload) {
-    state.pledgeCurrList = payload
+  setCurrList(state, payload) {
+    state.currList = payload
   },
   setAvailablePledgeNum(state, payload) {
     state.availablePledgeNum = payload
@@ -38,22 +33,16 @@ const mutations = {
 }
 
 const actions = {
-  async queryAllLoanCurrList({ state, commit }, payload) {
-    if(!state.loanCurrList.length) {
-      const result = await queryAllLoanCurrList()
-      commit('setAllLoanCurrList', result)
-    }
-  },
   async queryAllLoanLimit({ state, commit }, payload) {
     if(!state.loanLimit.length) {
       const result = await queryAllLoanLimit()
       commit('setAllLoanLimit', result)
     }
   },
-  async queryAllPledgeCurrList({ state, commit }, payload) {
-    if(!state.pledgeCurrList.length) {
-      const result = await queryAllPledgeCurrList()
-      commit('setAllPledgeCurrList', result)
+  async queryCurrList({ state, commit }, payload) {
+    if(!state.currList.length) {
+      const result = await queryCurrList()
+      commit('setCurrList', result)
     }
   },
   async queryAvailablePledgeNum({ state, commit }, payload) {
