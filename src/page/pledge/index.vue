@@ -235,7 +235,7 @@ export default {
     },
   },
   created() {
-    this.debounceQueryPledgeNum = debounce(this.queryPledgeNum, 50)
+    this.debounceQueryPledgeNum = debounce(this.queryPledgeNum, 2000)
   },
   mounted() {
     this.queryAllLoanLimit()
