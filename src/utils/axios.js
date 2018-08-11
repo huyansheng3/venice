@@ -9,6 +9,8 @@ import {
 	getSessionStorage,
 	removeSessionStorage
 } from '@/utils/mixin';
+import store from '../store'
+
 
 class Http {
   constructor(opts){
@@ -52,5 +54,17 @@ class Http {
     })
   }
 }
+
+// request拦截器
+axios.interceptors.request.use(config => {
+    const user = store.state.user
+    config.data = {...config.data, ...user};
+    return config
+  }, error => {
+    // Do something with request error
+    console.log(error) // for debug
+    Promise.reject(error)
+  })
+  
 
 export default Http;

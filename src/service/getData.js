@@ -87,3 +87,10 @@ export const queryTransUnitUSDT = (params) => http.require({
   method: 'GET',
   params
 });
+
+
+export const loginApp = (data) => http.require({
+  api: `${swiftApi}/loginApp`,
+  method: 'POST',
+  data
+});

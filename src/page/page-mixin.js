@@ -10,4 +10,10 @@ export default {
       return Boolean(Number(hideHeader))
     },
   },
+  mounted () {
+    const { query } = this.$route
+    if (!this.$store.getters.isAuth) {
+      this.$store.dispatch('login', query)
+    }
+  }
 }

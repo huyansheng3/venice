@@ -8,19 +8,18 @@
 </template>
 
 <script>
-  export default {
-    name: 'app',
-    components: {}
-  }
-
+export default {
+  name: 'app',
+  components: {},
+}
 </script>
 
 <style lang="scss">
-  @import './assets/common/css/theme.scss';
-  @import 'normalize.css';
-  @import 'mint-ui/lib/style.css';
+@import './assets/common/css/theme.scss';
+@import 'normalize.css';
+@import 'mint-ui/lib/style.css';
 
-  #app {
-    background-color: white;
-  }
+#app {
+  background-color: white;
+}
 </style>
