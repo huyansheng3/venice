@@ -1,6 +1,7 @@
 import 'babel-polyfill'
 import Vue from 'vue'
 import Router from 'vue-router'
+import TimeRangeSliderDemo from '@/components/time-range-slider/demo'
 
 const Pledge = ()=> import('page/pledge/index');
 const PledgeAgreement = ()=> import('page/pledge/agreement');
@@ -53,6 +54,11 @@ const appRouter = {
                 path: '/pledge/agreement',
                 name: 'pledgeAgreement',
                 component: PledgeAgreement,
+            },
+            {
+                path: '/time-range-slider',
+                name: 'timeRangeSlider',
+                component: TimeRangeSliderDemo,
             },
             {
                 path: '/pledge/success',

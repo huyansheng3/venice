@@ -46,15 +46,15 @@ Vue.config.errorHandler = function(err, vm, info)
   var componentName = formatComponentName(vm);
   var propsData = vm.$options && vm.$options.propsData;
 
-  fundebug.notifyError(err,
-  {
-      metaData:
-      {
-          componentName: componentName,
-          propsData: propsData,
-          info: info
-      }
-   });
+//   fundebug.notifyError(err,
+//   {
+//       metaData:
+//       {
+//           componentName: componentName,
+//           propsData: propsData,
+//           info: info
+//       }
+//    });
 };
 
 
