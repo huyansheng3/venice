@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      value: ['1:00', '12:00'],
+      value: ['05:00', '12:00'],
     }
   },
 }

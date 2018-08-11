@@ -1,12 +1,16 @@
 <template>
-  <div class="time-range-slider">
+  <div ref="slider" @click="handleSliderMousedown" class="time-range-slider">
     <div class="slider-time-show" slot="slider-time">
       <span>
         {{value[0]}} - {{value[1]}}
       </span>
     </div>
     <div class="slider-silder-container" role="time-range-slider">
-      <div class="slider-silder"></div>
+      <div class="slider-silder">
+        <div class="slider-slider-mask">
+          <div class="slider-slider-mask-item" :class="{selected: index === 1}"  :style="{flex: duration}" v-for="(duration, index) in selectedDurations" :key="index"></div>
+        </div>
+      </div>
       <div class="slider-tick">
         <div class="slider-tick-item" :style="{flex: tick.duration}" v-for="(tick, index) in ticks" :key="index">
           <span class="slider-tick-item-label">{{tick.label}}</span>
@@ -47,6 +51,19 @@ function generateTimeOptions(start = '00:00', end = '24:00', step = '00:15') {
   return options
 }
 
+function checkTime(time) {
+  if (/^\d{2}:\d{2}$/.test(time)) return true
+  return false
+}
+
+function caclTimeDuration(before = '00:00', after = '01:30') {
+  if (!(checkTime(before) || checkTime(checkTime))) return
+  const [hour, minute] = before.split(':').map(value => Number(value))
+  const [afterTickHour, afterTickMinute] = after.split(':').map(value => Number(value))
+  return (afterTickHour - hour) * 60 + (afterTickMinute - minute)
+}
+
+// 返回数组，用于刻度渲染
 function defaultTickRule(options) {
   const filterOpts = options.filter((opt, index) => index % 2 === 0)
 
@@ -54,13 +71,10 @@ function defaultTickRule(options) {
     const nextOpt = filterOpts[index + 1]
     let duration
     if (nextOpt) {
-      const [hour, minute] = opt.split(':').map(value => Number(value))
-      const [nextTickHour, nextTickMinute] = nextOpt.split(':').map(value => Number(value))
-      duration = (nextTickHour - hour) * 60 + (nextTickMinute - minute)
+      duration = caclTimeDuration(opt, nextOpt)
     } else {
       duration = 0
     }
-
     if (opt === '00:00' || opt === '12:00' || opt === '24:00') {
       return { time: opt, label: opt, duration }
     } else {
@@ -107,6 +121,12 @@ export default {
     ticks() {
       return this.tickRule(this.timeOptions)
     },
+    // 从0到选中开始，选中开始到选中结束，开始到结束
+    selectedDurations() {
+      const [start, end] = this.range
+      const [selectedStart, selectedEnd] = this.currentValue
+      return [caclTimeDuration(start, selectedStart), caclTimeDuration(selectedStart, selectedEnd), caclTimeDuration(selectedEnd, end)]
+    },
   },
   watch: {
     currentValue(val) {
@@ -127,6 +147,9 @@ export default {
     },
   },
   methods: {
+    handleSliderMousedown(e) {
+      console.log(e, this.$refs.slider.clientWidth)
+    },
     update() {
       // let value = this.currentValue
       // if (value < this.min) {
@@ -171,6 +194,41 @@ export default {
     .slider-silder {
       height: 12px;
       background-color: @gray;
+      position: relative;
+      .slider-slider-mask {
+        display: flex;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        &-item {
+          height: 12px;
+          box-sizing: border-box;
+        }
+        &-item.selected {
+          background-color: @orange-light;
+          border-left: 3px solid @orange;
+          border-right: 3px solid @orange;
+          position: relative;
+        }
+        &-item.selected::after,
+        &-item.selected::before {
+          position: absolute;
+          content: '';
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background-color: @orange;
+          top: -100%;
+        }
+        &-item.selected::before {
+          left: -7.5px;
+        }
+        &-item.selected::after {
+          right: -7.5px;
+        }
+      }
     }
     .slider-tick {
       display: flex;
