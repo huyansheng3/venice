@@ -47,7 +47,7 @@ const actions = {
   },
   async queryAvailablePledgeNum({ state, commit }, payload) {
     const result = await queryAvailablePledgeNum(payload)
-    commit('setAvailablePledgeNum', result)
+    commit('setAvailablePledgeNum', result.amount)
   },
   async queryEntrustRate({ state, commit }, payload){
     const result = await queryEntrustRate()

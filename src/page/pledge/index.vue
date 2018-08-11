@@ -217,7 +217,7 @@ export default {
       }
     },
     handlePledgeCurrChange(value) {
-      this.queryAvailablePledgeNum({ curr: value })
+      this.queryAvailablePledgeNum({ currencyType: value })
     },
     async queryTransUnitUSDT() {
       const result = await queryTransUnitUSDT({ curr: this.pledgeCurr })
@@ -242,7 +242,7 @@ export default {
     this.queryCurrList()
     this.queryEntrustRate()
     this.queryInterestRate()
-    this.queryAvailablePledgeNum({ curr: this.pledgeCurr })
+    this.queryAvailablePledgeNum({ currencyType: this.pledgeCurr })
     this.queryTransUnitUSDT()
   },
 }

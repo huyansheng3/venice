@@ -30,11 +30,7 @@ export const queryAllLoanLimit = () => http.require({
   api: `${swiftConfigPrefix}/queryAllLoanLimit`,
   method: 'GET'
 });
-export const queryAvailablePledgeNum = (params) => http.require({
-  api: `${swiftConfigPrefix}/queryAvailablePledgeNum`,
-  method: 'GET',
-  params
-});
+
 export const queryEntrustRate = () => http.require({
   api: `${swiftConfigPrefix}/queryEntrustRate`,
   method: 'GET'
@@ -91,6 +87,12 @@ export const queryTransUnitUSDT = (params) => http.require({
 
 export const loginApp = (data) => http.require({
   api: `${swiftApi}/loginApp`,
+  method: 'POST',
+  data
+});
+
+export const queryAvailablePledgeNum = (data) => http.require({
+  api: `${swiftApi}/queryAvailablePledgeNum`,
   method: 'POST',
   data
 });
