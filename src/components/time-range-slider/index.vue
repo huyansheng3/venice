@@ -1,5 +1,5 @@
 <template>
-  <div ref="slider" @click="handleSliderMousedown" class="time-range-slider">
+  <div ref="slider" @touchstart="handleSliderTouchstart" @touchmove="handleSliderTouchmove" @touchend="handleSliderTouchend" class="time-range-slider">
     <div class="slider-time-show" slot="slider-time">
       <span>
         {{value[0]}} - {{value[1]}}
@@ -57,10 +57,22 @@ function checkTime(time) {
 }
 
 function caclTimeDuration(before = '00:00', after = '01:30') {
-  if (!(checkTime(before) || checkTime(checkTime))) return
-  const [hour, minute] = before.split(':').map(value => Number(value))
-  const [afterTickHour, afterTickMinute] = after.split(':').map(value => Number(value))
-  return (afterTickHour - hour) * 60 + (afterTickMinute - minute)
+  return calcTimeMiunte(after) - calcTimeMiunte(before)
+}
+
+function calcTimeMiunte(time = '00:00') {
+  if (!checkTime(time)) return 0
+  const [hour, minute] = time.split(':').map(value => Number(value))
+  return hour * 60 + minute
+}
+
+function timeAppendOffset(time = '00:00', offsetMinutes = 60) {
+  if (!checkTime(time)) return
+  const [hour, minute] = time.split(':').map(value => Number(value))
+  const newHour = hour + Math.floor(offsetMinutes / 60)
+  const newMinute = minute + offsetMinutes % 60
+  const totalMinutes = newHour * 60 + newMinute
+  return `${addZeroForNumber(Math.floor(totalMinutes / 60))}:${addZeroForNumber(totalMinutes % 60)}`
 }
 
 // 返回数组，用于刻度渲染
@@ -81,6 +93,14 @@ function defaultTickRule(options) {
       return { time: opt, duration }
     }
   })
+}
+
+function fixStep(time = '12:23', step = '00:60') {
+  const [hour, minute] = time.split(':').map(value => Number(value))
+  const [, stepMinute] = step.split(':').map(value => Number(value))
+  const realMinutes = Math.round(minute / stepMinute) * stepMinute
+  const totalMinutes = hour * 60 + realMinutes
+  return `${addZeroForNumber(Math.floor(totalMinutes / 60))}:${addZeroForNumber(totalMinutes % 60)}`
 }
 
 export default {
@@ -127,46 +147,66 @@ export default {
       const [selectedStart, selectedEnd] = this.currentValue
       return [caclTimeDuration(start, selectedStart), caclTimeDuration(selectedStart, selectedEnd), caclTimeDuration(selectedEnd, end)]
     },
+    pixelPerMinute() {
+      const [start, end] = this.range
+      return this.$refs.slider.clientWidth / caclTimeDuration(start, end)
+    },
+    minutePerPixel() {
+      const [start, end] = this.range
+      return caclTimeDuration(start, end) / this.$refs.slider.clientWidth
+    },
   },
   watch: {
     currentValue(val) {
       this.$emit('input', val)
       this.$emit('on-change', val)
     },
-    value(val) {
-      this.currentValue = val
-    },
-    min() {
-      this.update()
-    },
-    step() {
-      this.update()
-    },
-    max() {
-      this.update()
-    },
   },
   methods: {
-    handleSliderMousedown(e) {
-      console.log(e, this.$refs.slider.clientWidth)
+    isGreaterCenter(x) {
+      const [selectedStart, selectedEnd] = this.currentValue
+      const center = (calcTimeMiunte(selectedStart) + calcTimeMiunte(selectedEnd)) / 2 * this.pixelPerMinute
+      return x - center > 0
     },
-    update() {
-      // let value = this.currentValue
-      // if (value < this.min) {
-      //   value = this.min
-      // }
-      // if (value > this.max) {
-      //   value = this.max
-      // }
-      // this.range.reInit({
-      //   min: this.min,
-      //   max: this.max,
-      //   step: this.step,
-      //   value,
-      // })
-      // this.currentValue = value
-      // this.range.setStart(this.currentValue)
-      // this.range.setStep()
+    handleSliderTouchstart(e) {
+      // touch 事件取不到 offsetX,计算大于中心点时稍有一点偏移
+      const touch = e.changedTouches[0] || {}
+      this.startX = touch.clientX
+      this.changeIndex = this.isGreaterCenter(touch.clientX) ? 1 : 0
+      this.startValue = this.currentValue[this.changeIndex]
+    },
+    handleSliderTouchmove(e) {
+      const { clientX } = e.changedTouches[0] || {}
+      const offsetMinutes = Math.round((clientX - this.startX) * this.minutePerPixel)
+      let changedValue = timeAppendOffset(this.startValue, offsetMinutes)
+
+      if (caclTimeDuration(changedValue, this.range[0]) >= 0) {
+        changedValue = this.range[0]
+      }
+      if (caclTimeDuration(changedValue, this.range[1]) <= 0) {
+        changedValue = this.range[1]
+      }
+
+      if (this.changeIndex === 0 && caclTimeDuration(changedValue, this.currentValue[1]) < 0) {
+        this.changeIndex = 1
+      }
+
+      if (this.changeIndex === 1 && caclTimeDuration(changedValue, this.currentValue[0]) > 0) {
+        this.changeIndex = 0
+      }
+
+      this.$set(this.currentValue, this.changeIndex, changedValue)
+    },
+
+    // 修复正确的 value,选中开始时间大于 range[0],小于选中结束时间
+    fixRightValue() {},
+    handleSliderTouchend(e) {
+      this.startX = null
+      this.changeIndex = null
+      this.startValue = null
+      const [start, end] = this.currentValue
+      this.$set(this.currentValue, 0, fixStep(start, this.step))
+      this.$set(this.currentValue, 1, fixStep(end, this.step))
     },
   },
 }
@@ -220,13 +260,14 @@ export default {
           height: 12px;
           border-radius: 50%;
           background-color: @orange;
-          top: -100%;
         }
         &-item.selected::before {
           left: -7.5px;
+          top: -100%;
         }
         &-item.selected::after {
           right: -7.5px;
+          top: 100%;
         }
       }
     }
