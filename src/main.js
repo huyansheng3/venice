@@ -15,11 +15,11 @@ import '@/utils/filters'
 import VeeValidate from 'vee-validate';
 import Cube from 'cube-ui'
 
-// if ('addEventListener' in document) {
-//     document.addEventListener('DOMContentLoaded', function() {
-//         FastClick.attach(document.body);
-//     }, false);
-// }
+if ('addEventListener' in document) {
+    document.addEventListener('DOMContentLoaded', function() {
+        FastClick.attach(document.body);
+    }, false);
+}
 
 Vue.use(MintUI)
 Vue.use(Cube)
