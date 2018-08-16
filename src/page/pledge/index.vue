@@ -62,7 +62,7 @@
              
               <div class="pledge-select">
                 <cube-select v-model="borrowDays" :options="loanLimit"></cube-select>
-                <p>到期本息合计: {{shouldReturnValue}} USDT(或等价ETH)</p>
+                <p>到期本息合计: {{shouldReturnValue}} USDT</p>
               </div>
             
           </div>
@@ -220,7 +220,7 @@ export default {
       this.queryAvailablePledgeNum({ currencyType: value })
     },
     async queryTransUnitUSDT() {
-      const result = await queryTransUnitUSDT({ curr: this.pledgeCurr })
+      const result = await queryTransUnitUSDT({ curr: this.borrowCurr })
       this.usdtUnit = result
     },
     queryPledgeNum() {

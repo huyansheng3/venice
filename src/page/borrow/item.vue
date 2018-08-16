@@ -44,6 +44,7 @@ import LIQUIDATED from './LIQUIDATED.png'
 import OVERDUED from './OVERDUED.png'
 import APPLYING from './APPLYING.png'
 import LOANING from './LOANING.png'
+import APPROVE_REJECT from './APPROVE_REJECT.png'
 import { mapActions, mapState, mapMutations } from 'vuex'
 import { dateFormat } from '@/utils/filters'
 import { changeStatus, queryTransUnitUSDT } from '@/service/getData'
@@ -55,6 +56,7 @@ const imgMap = {
   COMPLETED,
   LIQUIDATED,
   OVERDUED,
+  APPROVE_REJECT,
 }
 // createUser: "",
 // updateUser: "",
@@ -179,12 +181,12 @@ export default {
       return ['USDT', this.order.borrowCurr]
     },
     repayNumber() {
-      if(this.repayCurrency === 'USDT') {
+      if (this.repayCurrency === 'USDT') {
         return this.order.payableAmount
       } else {
         return this.borrowCurrNum
       }
-    }
+    },
   },
   methods: {
     ...mapMutations(['setOrder']),
@@ -193,7 +195,7 @@ export default {
       return changeStatus({ ...this.order, status: 'REPAYING' })
         .then(data => {
           const toast = this.$createToast({
-            type:'correct',
+            type: 'correct',
             txt: '还款成功',
           })
           toast.show()
@@ -205,7 +207,7 @@ export default {
     },
     async queryTransUnitUSDT() {
       const result = await queryTransUnitUSDT({ curr: this.order.borrowCurr })
-      this.borrowCurrNum = (this.order.payableAmount /result).toFixed(1)
+      this.borrowCurrNum = (this.order.payableAmount / result).toFixed(1)
     },
   },
   created() {
@@ -252,7 +254,7 @@ export default {
         .item {
           padding: 5px 0;
 
-           .status.LOANING {
+          .status.LOANING {
             color: @loading;
           }
           .status.APPLYING {
@@ -269,6 +271,9 @@ export default {
           }
           .status.OVERDUED {
             color: @overdue;
+          }
+          .status.APPROVE_REJECT {
+            color: #8b572a;
           }
         }
       }

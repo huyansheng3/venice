@@ -50,6 +50,7 @@ export const statusMap = {
   COMPLETED: '已完成',
   LIQUIDATED: '已平仓',
   OVERDUED: '已逾期',
+  APPROVE_REJECT: '审核拒绝',
 }
 
 export function getStatusText(status) {
@@ -155,6 +156,12 @@ export default {
 .OVERDUED {
   .status {
     background-color: @overdue;
+  }
+}
+
+.APPROVE_REJECT {
+  .status {
+    background-color: #8b572a;
   }
 }
 
