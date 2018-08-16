@@ -58,8 +58,9 @@ export default {
       console.log('watch dataSource2', val, index++)
     },
   },
-  // 总结一下 val ==== oldVal 不会触发 watch 事件
-  // this.$set 会触发整个对象的change, 随之触发整个对象的 watch 事件，也能触发子组件的 watch 事件
+  // 1. 总结一下 val ==== oldVal 不会触发 watch 事件
+  // 2. this.$set 会触发整个对象的change, 随之触发整个对象的 watch 事件，也能触发子组件的 watch 事件
+  // 但如果发现值相同，请参照上一条
   methods: {
     setCurrent(item) {
       console.log('setCurrent', index++)
