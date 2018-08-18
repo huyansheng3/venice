@@ -121,7 +121,7 @@ const list = borrow => [
   },
   {
     label: '到期应还：',
-    value: borrow.loanBorrowValue + 'USDT（或等价 ETH）',
+    value: (borrow.loanBorrowValue || 0) + 'USDT（或等价 ETH）',
   },
   {
     label: '应还时间：',
