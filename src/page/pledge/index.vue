@@ -12,7 +12,7 @@
               <div class="pledge-select" >
                 <cube-select @change="handlePledgeCurrChange" v-model="pledgeCurr" :options="currList"></cube-select>
                 <p>
-                  1{{pledgeCurr}}={{usdtUnit}}USDT
+                  1{{pledgeCurr}}={{pledgeUsdtUnit}}USDT
                 </p>
               </div>
             
@@ -87,11 +87,7 @@
 <script>
 import { Header, Button, Radio } from 'mint-ui'
 import { mapState, mapMutations, mapActions } from 'vuex'
-import {
-  applyLoan,
-  queryTransUnitUSDT,
-  queryPledgeNum,
-} from '@/service/getData'
+import { applyLoan, queryTransUnitUSDT, queryPledgeNum } from '@/service/getData'
 import pageMixin from '../page-mixin'
 import { debounce } from 'lodash'
 
@@ -139,15 +135,17 @@ export default {
       applyBorrowValue: 0,
       borrowDays: '',
       agreement: false,
-      usdtUnit: null,
+      pledgeUsdtUnit: null,
+      borrowUsdtUnit: null,
     }
   },
   watch: {
     pledgeCurr(newValue, oldValue) {
-      this.queryTransUnitUSDT()
+      this.queryPledgeUnitUSDT()
       this.debounceQueryPledgeNum()
     },
     borrowCurr(newValue, oldValue) {
+      this.queryBorrowUnitUSDT()
       this.debounceQueryPledgeNum()
     },
     borrowNum(newValue, oldValue) {
@@ -173,19 +171,11 @@ export default {
       return (this.borrowNum - this.entrustNum).toFixed(8)
     },
     shouldReturnValue() {
-      return (this.borrowNum * this.usdtUnit * (1 + this.interestRate)).toFixed(
-        3
-      )
+      return (this.borrowNum * this.borrowUsdtUnit * (1 + this.interestRate * (this.borrowDays || 0))).toFixed(3)
     },
   },
   methods: {
-    ...mapActions([
-      'queryAllLoanLimit',
-      'queryCurrList',
-      'queryAvailablePledgeNum',
-      'queryEntrustRate',
-      'queryInterestRate',
-    ]),
+    ...mapActions(['queryAllLoanLimit', 'queryCurrList', 'queryAvailablePledgeNum', 'queryEntrustRate', 'queryInterestRate']),
     validate() {
       const { borrowNum, borrowDays, agreement } = this
       let text
@@ -219,18 +209,20 @@ export default {
     handlePledgeCurrChange(value) {
       this.queryAvailablePledgeNum({ currencyType: value })
     },
-    async queryTransUnitUSDT() {
+    async queryPledgeUnitUSDT() {
+      const result = await queryTransUnitUSDT({ curr: this.pledgeCurr })
+      this.pledgeUsdtUnit = result
+    },
+    async queryBorrowUnitUSDT() {
       const result = await queryTransUnitUSDT({ curr: this.borrowCurr })
-      this.usdtUnit = result
+      this.borrowUsdtUnit = result
     },
     queryPledgeNum() {
       const { borrowCurr, borrowNum, pledgeCurr } = this
       if (borrowCurr && borrowNum && pledgeCurr) {
-        return queryPledgeNum({ borrowCurr, borrowNum, pledgeCurr }).then(
-          data => {
-            this.pledgeNum = data
-          }
-        )
+        return queryPledgeNum({ borrowCurr, borrowNum, pledgeCurr }).then(data => {
+          this.pledgeNum = data
+        })
       }
     },
   },
@@ -243,7 +235,8 @@ export default {
     this.queryEntrustRate()
     this.queryInterestRate()
     this.queryAvailablePledgeNum({ currencyType: this.pledgeCurr })
-    this.queryTransUnitUSDT()
+    this.queryPledgeUnitUSDT()
+    this.queryBorrowUnitUSDT()
   },
 }
 </script>

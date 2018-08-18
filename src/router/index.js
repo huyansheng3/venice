@@ -85,11 +85,6 @@ const appRouter = {
       name: 'borrow-item',
       component: BorrowItem,
     },
-    {
-      path: '/borrow-list/:id',
-      name: 'borrow-item',
-      component: BorrowItem,
-    },
 
     {
       path: '/test-vue',
