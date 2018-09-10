@@ -123,6 +123,11 @@ export default {
       type: String,
       default: '00:60',
     },
+    // 滑块拖动过程中的最小间隔
+    minRange: {
+      type: Number,
+      default: 60
+    },
     // 刻度尺显示规则
     tickRule: {
       type: Function,
@@ -178,8 +183,10 @@ export default {
     handleSliderTouchmove(e) {
       const { clientX } = e.changedTouches[0] || {}
       const offsetMinutes = Math.round((clientX - this.startX) * this.minutePerPixel)
+
       let changedValue = timeAppendOffset(this.startValue, offsetMinutes)
 
+      // 处理拖拽到首尾两端的情况
       if (caclTimeDuration(changedValue, this.range[0]) >= 0) {
         changedValue = this.range[0]
       }
@@ -187,19 +194,20 @@ export default {
         changedValue = this.range[1]
       }
 
-      if (this.changeIndex === 0 && caclTimeDuration(changedValue, this.currentValue[1]) < 0) {
+      // 处理两个滑块相互超过的情况
+      if (this.changeIndex === 0 && caclTimeDuration(changedValue, this.currentValue[1]) <= this.minRange) {
+        // 当前滑动的是第一块，并且第二块与第一块差值小于60分钟时，改为滑动第二块
         this.changeIndex = 1
+        changedValue = this.currentValue[1]
       }
-
-      if (this.changeIndex === 1 && caclTimeDuration(changedValue, this.currentValue[0]) > 0) {
+      if (this.changeIndex === 1 && caclTimeDuration(this.currentValue[0], changedValue) <= this.minRange) {
+        // 当前滑动的是第二块
         this.changeIndex = 0
+        changedValue = this.currentValue[0]
       }
 
       this.$set(this.currentValue, this.changeIndex, changedValue)
     },
-
-    // 修复正确的 value,选中开始时间大于 range[0],小于选中结束时间
-    fixRightValue() {},
     handleSliderTouchend(e) {
       this.startX = null
       this.changeIndex = null
